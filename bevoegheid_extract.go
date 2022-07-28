@@ -8,7 +8,6 @@ import (
 )
 
 var ErrPersonNotOnExtract = errors.New("person not found on extract")
-var ErrExtractNotFound = errors.New("extract not found")
 
 func convertDate(str string) string {
 	return str[6:] + "-" + str[4:6] + "-" + str[0:4]
@@ -70,7 +69,7 @@ func heeftGemachtigde(bevoegdheidExtract *models.BevoegdheidExtract, gemachtigde
 func GetBevoegdheidExtract(bevoegdheidExtract *models.BevoegdheidExtract, cert string, key string, useCache bool) error {
 	ophalenInschrijvingResponse, err := GetExtract(bevoegdheidExtract.KvkNummer, cert, key, useCache)
 	if err != nil {
-		return ErrExtractNotFound
+		return err
 	}
 
 	ma := ophalenInschrijvingResponse.Product.MaatschappelijkeActiviteit
