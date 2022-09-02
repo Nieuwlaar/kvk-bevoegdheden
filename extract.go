@@ -14,7 +14,7 @@ import (
 	"github.com/privacybydesign/kvk-extract/soap"
 )
 
-func GetExtract(kvkNummer, cert, key string, useCache bool) (*models.OphalenInschrijvingResponse, error) {
+func GetExtract(kvkNummer, cert, key string, useCache bool, env string) (*models.OphalenInschrijvingResponse, error) {
 	cachePath := "cache-extract"
 	ophalenInschrijvingResponse := models.OphalenInschrijvingResponse{}
 
@@ -46,7 +46,15 @@ func GetExtract(kvkNummer, cert, key string, useCache bool) (*models.OphalenInsc
 		KvkNummer: kvkNummer,
 	}
 
-	soapReq := soap.NewRequest("http://es.kvk.nl/ophalenInschrijving", "https://webservices.preprod.kvk.nl/postbus2", ophalenInschrijvingRequest, &ophalenInschrijvingResponse, nil)
+	url := "https://webservices.preprod.kvk.nl/postbus2"
+	toAddress := "http://es.kvk.nl/KVK-DataservicePP/2015/02"
+
+	if env == "prd" {
+		url = "https://webservices.kvk.nl/postbus2"
+		toAddress = "http://es.kvk.nl/KVK-Dataservice/2015/02"
+	}
+
+	soapReq := soap.NewRequest("http://es.kvk.nl/ophalenInschrijving", url, ophalenInschrijvingRequest, &ophalenInschrijvingResponse, nil)
 
 	soapReq.AddHeader(soap.ActionHeader{
 		ID:    "_2",
@@ -58,7 +66,7 @@ func GetExtract(kvkNummer, cert, key string, useCache bool) (*models.OphalenInsc
 	})
 	soapReq.AddHeader(soap.ToHeader{
 		ID:      "_4",
-		Address: "http://es.kvk.nl/KVK-DataservicePP/2015/02",
+		Address: toAddress,
 	})
 
 	soapReq.SignWith(wsseInfo)

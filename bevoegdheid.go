@@ -6,8 +6,8 @@ import (
 	"github.com/privacybydesign/kvk-extract/models"
 )
 
-func GetBevoegdheid(bevoegdheidExtract *models.BevoegdheidExtract, cert string, key string, useCache bool) error {
-	err := GetBevoegdheidExtract(bevoegdheidExtract, cert, key, useCache)
+func GetBevoegdheid(bevoegdheidExtract *models.BevoegdheidExtract, cert string, key string, useCache bool, env string) error {
+	err := GetBevoegdheidExtract(bevoegdheidExtract, cert, key, useCache, env)
 	if err != nil {
 		return err
 	}

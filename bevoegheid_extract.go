@@ -66,8 +66,8 @@ func heeftGemachtigde(bevoegdheidExtract *models.BevoegdheidExtract, gemachtigde
 }
 
 // GetBevoegdheidExtract TODO
-func GetBevoegdheidExtract(bevoegdheidExtract *models.BevoegdheidExtract, cert string, key string, useCache bool) error {
-	ophalenInschrijvingResponse, err := GetExtract(bevoegdheidExtract.KvkNummer, cert, key, useCache)
+func GetBevoegdheidExtract(bevoegdheidExtract *models.BevoegdheidExtract, cert string, key string, useCache bool, env string) error {
+	ophalenInschrijvingResponse, err := GetExtract(bevoegdheidExtract.KvkNummer, cert, key, useCache, env)
 	if err != nil {
 		return err
 	}
