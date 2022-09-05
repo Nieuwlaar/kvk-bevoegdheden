@@ -71,7 +71,7 @@ func GetExtract(kvkNummer, cert, key string, useCache bool, env string) (*models
 
 	soapReq.SignWith(wsseInfo)
 
-	certificate, _ := tls.LoadX509KeyPair(cert, key)
+	certificate, _ := tls.X509KeyPair([]byte(cert), []byte(key))
 
 	client := &http.Client{
 		Transport: &http.Transport{

@@ -10,7 +10,6 @@ import (
 	"encoding/pem"
 	"encoding/xml"
 	"fmt"
-	"io/ioutil"
 	"regexp"
 	"strings"
 	"time"
@@ -48,13 +47,13 @@ type WSSEAuthIDs struct {
 // These requests will be secured using the WS-Security X.509 security standard.
 // If the supplied certificate path does not point to a DER-encoded X.509 certificate, or
 // if the supplied key path does not point to a PEM-encoded X.509 certificate, an error will be returned.
-func NewWSSEAuthInfo(certPath string, keyPath string) (*WSSEAuthInfo, error) {
-	certFileContents, err := ioutil.ReadFile(certPath)
-	if err != nil {
-		return nil, err
-	}
+func NewWSSEAuthInfo(certDer string, keyContent string) (*WSSEAuthInfo, error) {
+	// certFileContents, err := ioutil.ReadFile(certPath)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	certDer := string(certFileContents)
+	// certDer := string(certFileContents)
 
 	// Super ugly way of getting the contents, but this works
 	newlineRegex := regexp.MustCompile(`\r?\n`)
@@ -62,12 +61,12 @@ func NewWSSEAuthInfo(certPath string, keyPath string) (*WSSEAuthInfo, error) {
 	certDer = strings.TrimPrefix(certDer, "-----BEGIN CERTIFICATE-----")
 	certDer = strings.TrimSuffix(certDer, "-----END CERTIFICATE-----")
 
-	keyFileContents, err := ioutil.ReadFile(keyPath)
-	if err != nil {
-		return nil, err
-	}
+	// keyFileContents, err := ioutil.ReadFile(keyPath)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	keyPemBlock, _ := pem.Decode(keyFileContents)
+	keyPemBlock, _ := pem.Decode([]byte(keyContent))
 
 	if keyPemBlock == nil || keyPemBlock.Type != "RSA PRIVATE KEY" {
 		return nil, ErrInvalidPEMFileSpecified
