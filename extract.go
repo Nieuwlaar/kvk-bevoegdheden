@@ -34,6 +34,10 @@ func GetExtract(kvkNummer, cert, key string, useCache bool, env string) (*models
 		}
 	}
 
+	if cert == "" || key == "" {
+		return nil, errors.New("no certificate or priv key, so no conn possible to HRDS")
+	}
+
 	fmt.Println("not using cache")
 
 	wsseInfo, authErr := soap.NewWSSEAuthInfo(cert, key)
