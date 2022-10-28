@@ -2,6 +2,7 @@ package bevoegdheden
 
 import (
 	"crypto/tls"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -16,6 +17,12 @@ var tr = &http.Transport{
 var client = &http.Client{Transport: tr}
 
 func SearchCompanies(searchTerm string, apiKey string, useCache bool) ([]byte, error) {
+	searchTermRegexp := regexp.MustCompile(`^[\w\-\s]+$`)
+	if searchTerm == "" || !searchTermRegexp.MatchString(searchTerm) {
+		fmt.Println("invalid searchterm")
+		return nil, errors.New("invalid searchterm")
+	}
+
 	cachePath := "cache-search"
 	if useCache {
 		cachedBody, err := os.ReadFile(cachePath + "/" + searchTerm + ".json")

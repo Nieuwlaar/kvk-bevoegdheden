@@ -13,6 +13,15 @@ type Interpretatie struct {
 	Reden          string `json:"reden"`
 }
 
+type BevoegdheidResponse struct {
+	BevoegdheidUittreksel *BevoegdheidUittreksel `json:"bevoegdheidUittreksel"`
+
+	ExtractOriginal    *MaatschappelijkeActiviteit `json:"extractOriginal"`
+	ExtractOriginalXML string                      `json:"extractOriginalXML"`
+
+	Paths *Paths `json:"paths"`
+}
+
 type BevoegdheidUittreksel struct {
 	KvkNummer          string `json:"kvkNummer"`
 	Rsin               string `json:"rsin"`
@@ -32,18 +41,8 @@ type BevoegdheidUittreksel struct {
 	BuitenlandseRechtstoestand string `json:"buitenlandseRechtstoestand"`
 	// Handlichting               string `json:"handlichting"`
 
-	Functionaris        *Functionaris  `json:"functionaris,omitempty"`
+	MatchedFunctionaris *Functionaris  `json:"matchedFunctionaris,omitempty"`
 	AlleFunctionarissen []Functionaris `json:"functionarissen"`
-}
-
-type BevoegdheidResponse struct {
-	BevoegdheidUittreksel *BevoegdheidUittreksel `json:"bevoegdheidUittreksel"`
-	Interpretatie         *Interpretatie         `json:"interpretatie"`
-
-	ExtractOriginal    *MaatschappelijkeActiviteit `json:"extractOriginal"`
-	ExtractOriginalXML string                      `json:"extractOriginalXML"`
-
-	Paths *Paths `json:"paths"`
 }
 
 type Functionaris struct {
@@ -75,6 +74,8 @@ type Functionaris struct {
 	SchorsingAanvang           string `json:"schorsingAanvang"`
 	SchorsingEinde             string `json:"schorsingEinde"`
 	Handlichting               string `json:"handlichting"`
+
+	Interpretatie Interpretatie `json:"interpretatie"`
 }
 
 type Paths struct {
@@ -96,5 +97,5 @@ type Paths struct {
 	BuitenlandseRechtstoestand string `json:"buitenlandseRechtstoestand"`
 	Handlichting               string `json:"handlichting"`
 
-	Functionaris Functionaris `json:"functionaris,omitempty"`
+	MatchedFunctionaris Functionaris `json:"matchedFunctionaris,omitempty"`
 }
