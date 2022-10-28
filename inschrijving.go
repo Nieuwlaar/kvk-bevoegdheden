@@ -17,7 +17,7 @@ import (
 var ErrInschrijvingNotFound = errors.New("inschrijving niet gevonden op basis van het KVK nummer")
 
 func GetInschrijving(kvkNummer, cert, key string, useCache bool, env string) (*models.OphalenInschrijvingResponse, error) {
-	cachePath := "cache-inschrijving"
+	cachePath := "cache-inschrijvingen"
 	ophalenInschrijvingResponse := models.OphalenInschrijvingResponse{}
 
 	if useCache {
