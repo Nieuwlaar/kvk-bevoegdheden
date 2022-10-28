@@ -16,8 +16,8 @@ type Interpretatie struct {
 type BevoegdheidResponse struct {
 	BevoegdheidUittreksel *BevoegdheidUittreksel `json:"bevoegdheidUittreksel"`
 
-	ExtractOriginal    *MaatschappelijkeActiviteit `json:"extractOriginal"`
-	ExtractOriginalXML string                      `json:"extractOriginalXML"`
+	Inschrijving    *MaatschappelijkeActiviteit `json:"inschrijving"`
+	InschrijvingXML string                      `json:"inschrijvingXML"`
 
 	Paths *Paths `json:"paths"`
 }

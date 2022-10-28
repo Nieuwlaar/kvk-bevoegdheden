@@ -1,4 +1,4 @@
-module github.com/privacybydesign/kvk-extract
+module github.com/privacybydesign/kvk-bevoegdheden
 
 go 1.18
 

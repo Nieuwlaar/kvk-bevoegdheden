@@ -12,7 +12,7 @@ type OphalenInschrijvingResponse struct {
 	Product   struct {
 		MaatschappelijkeActiviteit *MaatschappelijkeActiviteit `xml:"maatschappelijkeActiviteit" json:"maatschappelijkeActiviteit"`
 	} `xml:"product"`
-	ExtractOriginalXML string `json:"extractOriginal"`
+	InschrijvingXML string `json:"inschrijvingXML"`
 }
 
 type Meldingen struct {

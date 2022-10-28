@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"time"
 
-	"github.com/privacybydesign/kvk-extract/models"
+	"github.com/privacybydesign/kvk-bevoegdheden/models"
 )
 
 func isMinderjarig(gb string) bool {
@@ -43,7 +43,7 @@ func GetBevoegdheid(kvkNummer string, identityNP models.IdentityNP, cert string,
 		return nil, err
 	}
 
-	ophalenInschrijvingResponse, err := GetExtract(kvkNummer, cert, key, useCache, env)
+	ophalenInschrijvingResponse, err := GetInschrijving(kvkNummer, cert, key, useCache, env)
 	if err != nil {
 		return nil, err
 	}
@@ -58,8 +58,8 @@ func GetBevoegdheid(kvkNummer string, identityNP models.IdentityNP, cert string,
 	getBevoegdheidUittreksel(bevoegdheidUittreksel, paths, ophalenInschrijvingResponse, identityNP)
 
 	ma := ophalenInschrijvingResponse.Product.MaatschappelijkeActiviteit
-	bevoegdheidResponse.ExtractOriginalXML = ophalenInschrijvingResponse.ExtractOriginalXML
-	bevoegdheidResponse.ExtractOriginal = ma
+	bevoegdheidResponse.InschrijvingXML = ophalenInschrijvingResponse.InschrijvingXML
+	bevoegdheidResponse.Inschrijving = ma
 
 	return bevoegdheidResponse, nil
 }

@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/privacybydesign/kvk-extract/models"
+	"github.com/privacybydesign/kvk-bevoegdheden/models"
 )
 
 var ErrInvalidInput = errors.New("KVK nummer of persoonsgegevens kloppen niet")

@@ -10,14 +10,14 @@ import (
 	"os"
 
 	"github.com/google/uuid"
-	"github.com/privacybydesign/kvk-extract/models"
-	"github.com/privacybydesign/kvk-extract/soap"
+	"github.com/privacybydesign/kvk-bevoegdheden/models"
+	"github.com/privacybydesign/kvk-bevoegdheden/soap"
 )
 
-var ErrExtractNotFound = errors.New("Inschrijving niet gevonden op basis van het KVK nummer")
+var ErrInschrijvingNotFound = errors.New("inschrijving niet gevonden op basis van het KVK nummer")
 
-func GetExtract(kvkNummer, cert, key string, useCache bool, env string) (*models.OphalenInschrijvingResponse, error) {
-	cachePath := "cache-extract"
+func GetInschrijving(kvkNummer, cert, key string, useCache bool, env string) (*models.OphalenInschrijvingResponse, error) {
+	cachePath := "cache-inschrijving"
 	ophalenInschrijvingResponse := models.OphalenInschrijvingResponse{}
 
 	if useCache {
@@ -31,7 +31,7 @@ func GetExtract(kvkNummer, cert, key string, useCache bool, env string) (*models
 			}
 			r := envelope.Body.Content.(*models.OphalenInschrijvingResponse)
 
-			r.ExtractOriginalXML = string(respBody)
+			r.InschrijvingXML = string(respBody)
 			return r, nil
 		}
 	}
@@ -99,7 +99,7 @@ func GetExtract(kvkNummer, cert, key string, useCache bool, env string) (*models
 	} else if ophalenInschrijvingResponse.Meldingen.Fout != nil {
 		fmt.Printf("SOAP fault experienced during call: %s\n", ophalenInschrijvingResponse.Meldingen.Fout.Omschrijving)
 		if ophalenInschrijvingResponse.Meldingen.Fout.Code == "IPD0004" {
-			return nil, ErrExtractNotFound
+			return nil, ErrInschrijvingNotFound
 		}
 		return nil, errors.New(ophalenInschrijvingResponse.Meldingen.Fout.Omschrijving)
 	}
@@ -111,11 +111,11 @@ func GetExtract(kvkNummer, cert, key string, useCache bool, env string) (*models
 		_ = os.WriteFile(cachePath+"/"+kvkNummer+".xml", soapResp.RespBody, 0644)
 	}
 
-	ophalenInschrijvingResponse.ExtractOriginalXML = string(soapResp.RespBody)
+	ophalenInschrijvingResponse.InschrijvingXML = string(soapResp.RespBody)
 
 	// ma := ophalenInschrijvingResponse.Product.MaatschappelijkeActiviteit
 	// jsonMA, _ := json.MarshalIndent(ma, "", "  ")
-	// _ = os.WriteFile("extract.json", jsonMA, 0644)
+	// _ = os.WriteFile("inschrijving.json", jsonMA, 0644)
 
 	// data, _ := os.ReadFile("all.json")
 	// bvgn := []models.Bevoegdheid{}
