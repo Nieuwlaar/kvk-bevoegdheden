@@ -10,8 +10,8 @@ import (
 	"os"
 
 	"github.com/google/uuid"
-	"github.com/privacybydesign/kvk-bevoegdheden/models"
-	"github.com/privacybydesign/kvk-bevoegdheden/soap"
+	"github.com/kvk-innovatie/kvk-bevoegdheden/models"
+	"github.com/kvk-innovatie/kvk-bevoegdheden/soap"
 )
 
 var ErrInschrijvingNotFound = errors.New("inschrijving niet gevonden op basis van het KVK nummer")

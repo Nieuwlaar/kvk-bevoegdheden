@@ -1,4 +1,4 @@
-module github.com/privacybydesign/kvk-bevoegdheden
+module github.com/kvk-innovatie/kvk-bevoegdheden
 
 go 1.18
 

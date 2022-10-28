@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"time"
 
-	"github.com/privacybydesign/kvk-bevoegdheden/models"
+	"github.com/kvk-innovatie/kvk-bevoegdheden/models"
 )
 
 func isMinderjarig(gb string) bool {
