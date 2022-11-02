@@ -23,6 +23,7 @@ type BevoegdheidResponse struct {
 }
 
 type BevoegdheidUittreksel struct {
+	Peilmoment         string `json:"peilmoment"`
 	KvkNummer          string `json:"kvkNummer"`
 	Rsin               string `json:"rsin"`
 	Naam               string `json:"naam"`

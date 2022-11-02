@@ -387,8 +387,9 @@ func eigenaarIsNietNatuurlijkPersoon(bevoegdheidUittreksel *models.BevoegdheidUi
 
 // GetBevoegdheidUittreksel TODO
 func getBevoegdheidUittreksel(bevoegdheidUittreksel *models.BevoegdheidUittreksel, paths *models.Paths, ophalenInschrijvingResponse *models.OphalenInschrijvingResponse, identityNP models.IdentityNP) {
-	ma := ophalenInschrijvingResponse.Product.MaatschappelijkeActiviteit
+	bevoegdheidUittreksel.Peilmoment = ophalenInschrijvingResponse.Peilmoment
 
+	ma := ophalenInschrijvingResponse.Product.MaatschappelijkeActiviteit
 	bevoegdheidUittreksel.KvkNummer = ma.KvkNummer
 	bevoegdheidUittreksel.Naam = ma.Naam
 	bevoegdheidUittreksel.Adres = ma.BezoekLocatie.VolledigAdres

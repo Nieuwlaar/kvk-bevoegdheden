@@ -8,8 +8,9 @@ type OphalenInschrijvingRequest struct {
 }
 
 type OphalenInschrijvingResponse struct {
-	Meldingen *Meldingen `xml:"meldingen" json:"meldingen"`
-	Product   struct {
+	Peilmoment string     `xml:"peilmoment,attr"`
+	Meldingen  *Meldingen `xml:"meldingen" json:"meldingen"`
+	Product    struct {
 		MaatschappelijkeActiviteit *MaatschappelijkeActiviteit `xml:"maatschappelijkeActiviteit" json:"maatschappelijkeActiviteit"`
 	} `xml:"product"`
 	InschrijvingXML string `json:"inschrijvingXML"`
