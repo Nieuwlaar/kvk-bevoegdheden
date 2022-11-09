@@ -76,6 +76,7 @@ type Eenmanszaak struct { // in KVK productstore this is 'natuurlijkPersoon' but
 }
 
 type NietNatuurlijkPersoon struct {
+	Rsin                       string                     `xml:"rsin" json:"rsin"`
 	Registratie                Registratie                `xml:"registratie" json:"registratie"`
 	DatumUitschrijving         string                     `xml:"datumUitschrijving" json:"datumUitschrijving"`
 	PersoonRechtsvorm          string                     `xml:"persoonRechtsvorm" json:"persoonRechtsvorm"`
@@ -84,7 +85,6 @@ type NietNatuurlijkPersoon struct {
 	BuitenlandseRechtstoestand BuitenlandseRechtstoestand `xml:"buitenlandseRechtstoestand" json:"buitenlandseRechtstoestand"`
 	Ontbinding                 Ontbinding                 `xml:"ontbinding" json:"ontbinding"`
 	Heeft                      []Functievervulling        `xml:"heeft" json:"heeft"`
-	Rsin                       string                     `xml:"rsin" json:"rsin"`
 	// LandVanVestiging           Enumeratie                  `xml:"landVanVestiging" json:"landVanVestiging"`
 }
 
