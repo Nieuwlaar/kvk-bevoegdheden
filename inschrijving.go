@@ -6,8 +6,10 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/google/uuid"
 	"github.com/kvk-innovatie/kvk-bevoegdheden/models"
@@ -16,12 +18,33 @@ import (
 
 var ErrInschrijvingNotFound = errors.New("inschrijving niet gevonden op basis van het KVK nummer")
 
+func getFilePath(kvkNummer string) string {
+	// make it possible to annotate cached files in the filename as postfix
+	// cached files start with a kvkNummer
+	cachePath := "./cache-inschrijvingen/"
+	files, err := ioutil.ReadDir(cachePath)
+	if err != nil {
+		return ""
+	}
+	var filePath string
+	for _, file := range files {
+		if !file.IsDir() {
+			if strings.HasPrefix(file.Name(), kvkNummer) {
+				filePath = cachePath + file.Name()
+				break
+			}
+		}
+	}
+	return filePath
+}
+
 func GetInschrijving(kvkNummer, cert, key string, useCache bool, env string) (*models.OphalenInschrijvingResponse, error) {
 	cachePath := "cache-inschrijvingen"
 	ophalenInschrijvingResponse := models.OphalenInschrijvingResponse{}
 
 	if useCache {
-		respBody, err := os.ReadFile(cachePath + "/" + kvkNummer + ".xml")
+		filePath := getFilePath(kvkNummer)
+		respBody, err := os.ReadFile(filePath)
 		if err == nil {
 			fmt.Println("using cache")
 			envelope := soap.NewEnvelope(&ophalenInschrijvingResponse)

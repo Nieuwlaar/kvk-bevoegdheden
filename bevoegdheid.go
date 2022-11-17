@@ -19,7 +19,7 @@ func isMinderjarig(gb string) bool {
 }
 
 func validateInput(kvkNummer string, identityNP models.IdentityNP) error {
-	kvkRegexp := regexp.MustCompile(`^\d{8}.*$`)
+	kvkRegexp := regexp.MustCompile(`^\d{8}$`)
 	if kvkNummer == "" || !kvkRegexp.MatchString(kvkNummer) {
 		fmt.Println("kvk nummer klopt niet")
 		return ErrInvalidInput
