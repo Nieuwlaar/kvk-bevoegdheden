@@ -96,7 +96,7 @@ type Paths struct {
 	BijzondereRechtstoestand   string `json:"bijzondereRechtstoestand"`
 	BeperkingInRechtshandeling string `json:"beperkingInRechtshandeling"`
 	BuitenlandseRechtstoestand string `json:"buitenlandseRechtstoestand"`
-	Handlichting               string `json:"handlichting"`
+	// Handlichting               string `json:"handlichting"`
 
 	MatchedFunctionaris Functionaris `json:"matchedFunctionaris,omitempty"`
 }
