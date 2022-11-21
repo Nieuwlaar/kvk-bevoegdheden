@@ -145,7 +145,8 @@ func addInterpretatie(bevoegdheidUittreksel *models.BevoegdheidUittreksel, funct
 		return
 	}
 
-	if bevoegdheidUittreksel.BeperkingInRechtshandeling != "" && strings.Split(bevoegdheidUittreksel.BeperkingInRechtshandeling, ":")[1] != "WHOA" {
+	// if bevoegdheidUittreksel.BeperkingInRechtshandeling != "" && strings.Split(bevoegdheidUittreksel.BeperkingInRechtshandeling, ":")[1] != "WHOA" {
+	if bevoegdheidUittreksel.BeperkingInRechtshandeling != "" {
 		interpretatie.HeeftBeperking = true
 		interpretatie.IsBevoegd = "Nee"
 		interpretatie.Reden = fmt.Sprintf("De inschrijving %s heeft een beperking in rechtshandeling: %s", bevoegdheidUittreksel.KvkNummer, bevoegdheidUittreksel.BeperkingInRechtshandeling)
