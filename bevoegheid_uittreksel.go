@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
-	"strings"
 
 	"github.com/kvk-innovatie/kvk-bevoegdheden/models"
 )
