@@ -431,6 +431,15 @@ func getBevoegdheidUittreksel(bevoegdheidUittreksel *models.BevoegdheidUittrekse
 		}
 	}
 
+	for i, handeltOnder := range ma.ManifesteertZichAls.Onderneming.HandeltOnder {
+		prefix := ", "
+		if i == 0 {
+			prefix = ""
+		}
+		bevoegdheidUittreksel.Handelsnamen = bevoegdheidUittreksel.Handelsnamen + prefix + handeltOnder.Handelsnaam.Naam
+	}
+	paths.Handelsnamen = "maatschappelijkeActiviteit.manifesteertZichAls.onderneming.handeltOnder"
+
 	if ma.HeeftAlsEigenaar.Eenmanszaak != nil {
 		eigenaarIsNatuurlijkPersoon(bevoegdheidUittreksel, paths, identityNP, ma.HeeftAlsEigenaar.Eenmanszaak, "NatuurlijkPersoon", "maatschappelijkeActiviteit.heeftAlsEigenaar.natuurlijkPersoon")
 	} else if ma.HeeftAlsEigenaar.NaamPersoon != nil {

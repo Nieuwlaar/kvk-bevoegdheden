@@ -46,6 +46,11 @@ type MaatschappelijkeActiviteit struct {
 				SbiCode           Enumeratie `xml:"sbiCode" json:"sbiCode"`
 				IsHoofdactiviteit Enumeratie `xml:"isHoofdactiviteit" json:"isHoofdactiviteit"`
 			} `xml:"sbiActiviteit" json:"sbiActiviteit"`
+			HandeltOnder []struct {
+				Handelsnaam struct {
+					Naam string `xml:"naam" json:"naam"`
+				} `xml:"handelsnaam" json:"handelsnaam"`
+			} `xml:"handeltOnder" json:"handeltOnder"`
 		} `xml:"onderneming" json:"onderneming"`
 	} `xml:"manifesteertZichAls" json:"manifesteertZichAls"`
 	HeeftAlsEigenaar struct {

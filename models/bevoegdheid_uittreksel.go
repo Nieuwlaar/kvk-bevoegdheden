@@ -27,6 +27,7 @@ type BevoegdheidUittreksel struct {
 	KvkNummer          string `json:"kvkNummer"`
 	Rsin               string `json:"rsin"`
 	Naam               string `json:"naam"`
+	Handelsnamen       string `json:"handelsnamen"`
 	TypeEigenaar       string `json:"typeEigenaar"`
 	PersoonRechtsvorm  string `json:"persoonRechtsvorm"`
 	Adres              string `json:"adres"`
@@ -83,6 +84,7 @@ type Paths struct {
 	KvkNummer          string `json:"kvkNummer"`
 	Rsin               string `json:"rsin"`
 	Naam               string `json:"naam"`
+	Handelsnamen       string `json:"handelsnamen"`
 	TypeEigenaar       string `json:"typeEigenaar"`
 	PersoonRechtsvorm  string `json:"persoonRechtsvorm"`
 	Adres              string `json:"adres"`
