@@ -8,7 +8,7 @@ type IdentityNP struct {
 }
 
 type Interpretatie struct {
-	HeeftBeperking bool   `json:"heeftBeperking"`
+	HeeftBeperking string `json:"heeftBeperking"`
 	IsBevoegd      string `json:"isBevoegd"`
 	Reden          string `json:"reden"`
 }

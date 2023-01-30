@@ -116,6 +116,7 @@ func getFunctionarisPaths(basePath string) models.Functionaris {
 func addInterpretatie(bevoegdheidUittreksel *models.BevoegdheidUittreksel, functionaris *models.Functionaris) {
 	namePerson := fmt.Sprintf("%s %s %s", functionaris.Voornamen, functionaris.VoorvoegselGeslachtsnaam, functionaris.Geslachtsnaam)
 	interpretatie := &functionaris.Interpretatie
+	interpretatie.HeeftBeperking = "Nee"
 
 	// if functionaris == nil {
 	// 	interpretatie.IsBevoegd = "Nee"
@@ -124,21 +125,21 @@ func addInterpretatie(bevoegdheidUittreksel *models.BevoegdheidUittreksel, funct
 	// }
 
 	if bevoegdheidUittreksel.DatumUitschrijving != "" {
-		interpretatie.HeeftBeperking = true
+		interpretatie.HeeftBeperking = "Ja"
 		interpretatie.IsBevoegd = "Nee"
 		interpretatie.Reden = fmt.Sprintf("De inschrijving %s staat niet meer ingeschreven: %s", bevoegdheidUittreksel.KvkNummer, bevoegdheidUittreksel.DatumUitschrijving)
 		return
 	}
 
 	if bevoegdheidUittreksel.RegistratieEinde != "" {
-		interpretatie.HeeftBeperking = true
+		interpretatie.HeeftBeperking = "Ja"
 		interpretatie.IsBevoegd = "Nee"
 		interpretatie.Reden = fmt.Sprintf("De inschrijving %s is niet (meer) actief: %s", bevoegdheidUittreksel.KvkNummer, bevoegdheidUittreksel.RegistratieEinde)
 		return
 	}
 
 	if bevoegdheidUittreksel.BijzondereRechtstoestand != "" {
-		interpretatie.HeeftBeperking = true
+		interpretatie.HeeftBeperking = "Ja"
 		interpretatie.IsBevoegd = "Nee"
 		interpretatie.Reden = fmt.Sprintf("De inschrijving %s heeft een bijzondere rechtstoestand: %s", bevoegdheidUittreksel.KvkNummer, bevoegdheidUittreksel.BijzondereRechtstoestand)
 		return
@@ -146,49 +147,49 @@ func addInterpretatie(bevoegdheidUittreksel *models.BevoegdheidUittreksel, funct
 
 	// if bevoegdheidUittreksel.BeperkingInRechtshandeling != "" && strings.Split(bevoegdheidUittreksel.BeperkingInRechtshandeling, ":")[1] != "WHOA" {
 	if bevoegdheidUittreksel.BeperkingInRechtshandeling != "" {
-		interpretatie.HeeftBeperking = true
+		interpretatie.HeeftBeperking = "Ja"
 		interpretatie.IsBevoegd = "Nee"
 		interpretatie.Reden = fmt.Sprintf("De inschrijving %s heeft een beperking in rechtshandeling: %s", bevoegdheidUittreksel.KvkNummer, bevoegdheidUittreksel.BeperkingInRechtshandeling)
 		return
 	}
 
 	if bevoegdheidUittreksel.BuitenlandseRechtstoestand != "" {
-		interpretatie.HeeftBeperking = true
+		interpretatie.HeeftBeperking = "Ja"
 		interpretatie.IsBevoegd = "Nee"
 		interpretatie.Reden = fmt.Sprintf("De inschrijving %s heeft een buitenlandse rechtstoestand: %s", bevoegdheidUittreksel.KvkNummer, bevoegdheidUittreksel.BuitenlandseRechtstoestand)
 		return
 	}
 
 	if functionaris.Overlijdensdatum != "" {
-		interpretatie.HeeftBeperking = true
+		interpretatie.HeeftBeperking = "Ja"
 		interpretatie.IsBevoegd = "Nee"
 		interpretatie.Reden = fmt.Sprintf("De persoon %s staat geregistreerd als overleden op %s", namePerson, functionaris.Overlijdensdatum)
 		return
 	}
 
 	if functionaris.BijzondereRechtstoestand != "" {
-		interpretatie.HeeftBeperking = true
+		interpretatie.HeeftBeperking = "Ja"
 		interpretatie.IsBevoegd = "Nee"
 		interpretatie.Reden = fmt.Sprintf("De persoon %s heeft een bijzondere rechtstoestand: %s", namePerson, functionaris.BijzondereRechtstoestand)
 		return
 	}
 
 	if functionaris.BeperkingInRechtshandeling != "" {
-		interpretatie.HeeftBeperking = true
+		interpretatie.HeeftBeperking = "Ja"
 		interpretatie.IsBevoegd = "Nee"
 		interpretatie.Reden = fmt.Sprintf("De persoon %s heeft een beperking in rechtshandeling: %s", namePerson, functionaris.BeperkingInRechtshandeling)
 		return
 	}
 
 	if functionaris.SchorsingAanvang != "" && functionaris.SchorsingEinde == "" {
-		interpretatie.HeeftBeperking = true
+		interpretatie.HeeftBeperking = "Ja"
 		interpretatie.IsBevoegd = "Nee"
 		interpretatie.Reden = fmt.Sprintf("De persoon %s is geschorst sinds: %s", namePerson, functionaris.SchorsingAanvang)
 		return
 	}
 
 	if isMinderjarig(functionaris.Geboortedatum) {
-		interpretatie.HeeftBeperking = true
+		interpretatie.HeeftBeperking = "Ja"
 		interpretatie.IsBevoegd = "Nee"
 
 		if bevoegdheidUittreksel.PersoonRechtsvorm == "Eenmanszaak" && functionaris.TypeFunctionaris == "Eigenaar" {
