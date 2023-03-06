@@ -267,13 +267,15 @@ type Bevoegdheid struct {
 	IsBevoegdMetAnderePersonen Enumeratie `xml:"isBevoegdMetAnderePersonen" json:"isBevoegdMetAnderePersonen"`
 }
 
+type BeperkingInHandeling struct {
+	SoortHandeling Enumeratie `xml:"soortHandeling" json:"soortHandeling"`
+}
+
 type Volmacht struct {
 	TypeVolmacht     Enumeratie `xml:"typeVolmacht" json:"typeVolmacht"`
 	BeperkteVolmacht struct {
-		BeperkingInHandeling struct {
-			SoortHandeling Enumeratie `xml:"soortHandeling" json:"soortHandeling"`
-		} `xml:"beperkingInHandeling" json:"beperkingInHandeling"`
-		BeperkingInGeld struct {
+		BeperkingInHandeling []BeperkingInHandeling `xml:"beperkingInHandeling" json:"beperkingInHandeling"`
+		BeperkingInGeld      struct {
 			Waarde string     `xml:"waarde" json:"waarde"`
 			Valuta Enumeratie `xml:"valuta" json:"valuta"`
 		} `xml:"beperkingInGeld" json:"beperkingInGeld"`

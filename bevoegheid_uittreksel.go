@@ -10,6 +10,15 @@ import (
 
 var ErrInvalidInput = errors.New("KVK nummer of persoonsgegevens kloppen niet")
 
+var importanceTypeFunctionaris = map[string]int64{
+	"Aansprakelijke":                       5,
+	"Bestuursfunctie":                      5,
+	"FunctionarisBijzondereRechtstoestand": 4,
+	"PubliekrechtelijkeFunctionaris":       3,
+	"Gemachtigde":                          2,
+	"OverigeFunctionaris":                  1,
+}
+
 func convertDate(str string) string {
 	if str == "" {
 		return str
@@ -38,9 +47,17 @@ func getFunctionaris(functionarisOfGemachtigde *models.FunctionarisOfGemachtigde
 		beperkingInGeld = bvm.BeperkingInGeld.Waarde + " " + bvm.BeperkingInGeld.Valuta.Omschrijving
 	}
 	soortBeperkingInHandeling := ""
-	if bvm.BeperkingInHandeling.SoortHandeling.Code != "" {
-		soortBeperkingInHandeling = bvm.BeperkingInHandeling.SoortHandeling.Omschrijving + ":" + bvm.BeperkingInHandeling.SoortHandeling.Code
+
+	for i, bih := range bvm.BeperkingInHandeling {
+		prefix := ", "
+		if i == 0 {
+			prefix = ""
+		}
+		if bih.SoortHandeling.Code != "" {
+			soortBeperkingInHandeling = soortBeperkingInHandeling + prefix + bih.SoortHandeling.Omschrijving + ":" + bih.SoortHandeling.Code
+		}
 	}
+
 	bijzondereRechtstoestand := ""
 	if np.BijzondereRechtstoestand.Soort.Code != "" {
 		bijzondereRechtstoestand = np.BijzondereRechtstoestand.Soort.Omschrijving + ":" + np.BijzondereRechtstoestand.Soort.Code
@@ -78,6 +95,20 @@ func getFunctionaris(functionarisOfGemachtigde *models.FunctionarisOfGemachtigde
 		VolledigeNaam:              np.VolledigeNaam,
 		BijzondereRechtstoestand:   bijzondereRechtstoestand,
 		BeperkingInRechtshandeling: beperkingInRechtshandeling,
+
+		Importance: importanceTypeFunctionaris[functionarisType],
+	}
+}
+
+func getRechtspersoonFunctionaris(functionarisOfGemachtigde *models.FunctionarisOfGemachtigde, functionarisType string) models.RechtspersoonFunctionaris {
+	rp := functionarisOfGemachtigde.Door.Rechtspersoon
+
+	return models.RechtspersoonFunctionaris{
+		KvkNummer:         rp.IsEigenaarVan.MaatschappelijkeActiviteit.KvkNummer,
+		PersoonRechtsvorm: rp.PersoonRechtsvorm,
+		Naam:              rp.VolledigeNaam,
+		TypeFunctionaris:  functionarisType,
+		Functie:           functionarisOfGemachtigde.Functie.Omschrijving,
 	}
 }
 
@@ -97,7 +128,7 @@ func getFunctionarisPaths(basePath string) models.Functionaris {
 
 		TypeVolmacht:                 basePath + ".volmacht.typeVolmacht.omschrijving",
 		BeperkingInGeldVolmacht:      basePath + ".volmacht.beperkteVolmacht.beperkingInGeld",
-		BeperkingInHandelingVolmacht: basePath + ".volmacht.beperkteVolmacht.beperkingInHandeling.soortHandeling",
+		BeperkingInHandelingVolmacht: basePath + ".volmacht.beperkteVolmacht.beperkingInHandeling",
 		HeeftOverigeVolmacht:         basePath + ".volmacht.beperkteVolmacht.heeftOverigeVolmacht.omschrijving",
 		OmschrijvingOverigeVolmacht:  basePath + ".volmacht.beperkteVolmacht.omschrijvingOverigeVolmacht",
 		MagOpgaveHandelsregisterDoen: basePath + ".volmacht.beperkteVolmacht.magOpgaveHandelsregisterDoen.omschrijving",
@@ -117,12 +148,6 @@ func addInterpretatie(bevoegdheidUittreksel *models.BevoegdheidUittreksel, funct
 	namePerson := fmt.Sprintf("%s %s %s", functionaris.Voornamen, functionaris.VoorvoegselGeslachtsnaam, functionaris.Geslachtsnaam)
 	interpretatie := &functionaris.Interpretatie
 	interpretatie.HeeftBeperking = "Nee"
-
-	// if functionaris == nil {
-	// 	interpretatie.IsBevoegd = "Nee"
-	// 	interpretatie.Reden = fmt.Sprintf("De persoon %s komt niet voor op de inschrijving van %s", namePerson, bevoegdheidUittreksel.KvkNummer)
-	// 	return
-	// }
 
 	if bevoegdheidUittreksel.DatumUitschrijving != "" {
 		interpretatie.HeeftBeperking = "Ja"
@@ -145,7 +170,6 @@ func addInterpretatie(bevoegdheidUittreksel *models.BevoegdheidUittreksel, funct
 		return
 	}
 
-	// if bevoegdheidUittreksel.BeperkingInRechtshandeling != "" && strings.Split(bevoegdheidUittreksel.BeperkingInRechtshandeling, ":")[1] != "WHOA" {
 	if bevoegdheidUittreksel.BeperkingInRechtshandeling != "" {
 		interpretatie.HeeftBeperking = "Ja"
 		interpretatie.IsBevoegd = "Nee"
@@ -285,6 +309,18 @@ func loopFunctionarissen(bevoegdheidUittreksel *models.BevoegdheidUittreksel, pa
 
 		np := functionarisOfGemachtigde.Door.NatuurlijkPersoon
 		if np == nil {
+			rp := functionarisOfGemachtigde.Door.Rechtspersoon
+			if rp == nil {
+				continue
+			}
+			rechtsPersoonFunctionaris := models.RechtspersoonFunctionaris{
+				KvkNummer:         rp.IsEigenaarVan.MaatschappelijkeActiviteit.KvkNummer,
+				PersoonRechtsvorm: rp.PersoonRechtsvorm,
+				Naam:              rp.VolledigeNaam,
+				TypeFunctionaris:  functionarisType,
+				Functie:           functionarisOfGemachtigde.Functie.Omschrijving,
+			}
+			bevoegdheidUittreksel.AlleRechtspersoonFunctionarissen = append(bevoegdheidUittreksel.AlleRechtspersoonFunctionarissen, rechtsPersoonFunctionaris)
 			continue
 		}
 
@@ -298,9 +334,11 @@ func loopFunctionarissen(bevoegdheidUittreksel *models.BevoegdheidUittreksel, pa
 			VoorvoegselGeslachtsnaam: np.VoorvoegselGeslachtsnaam,
 			Geboortedatum:            convertDate(np.Geboortedatum),
 		}
-		if bevoegdheidUittreksel.MatchedFunctionaris == nil && isSamePerson(identityNP, identityFunctionaris) {
-			bevoegdheidUittreksel.MatchedFunctionaris = &functionaris
-			paths.MatchedFunctionaris = getFunctionarisPaths(path)
+		if isSamePerson(identityNP, identityFunctionaris) {
+			if bevoegdheidUittreksel.MatchedFunctionaris == nil || bevoegdheidUittreksel.MatchedFunctionaris.Importance < functionaris.Importance {
+				bevoegdheidUittreksel.MatchedFunctionaris = &functionaris
+				paths.MatchedFunctionaris = getFunctionarisPaths(path)
+			}
 		}
 	}
 }
@@ -332,6 +370,7 @@ func eigenaarIsNatuurlijkPersoon(bevoegdheidUittreksel *models.BevoegdheidUittre
 		Overlijdensdatum:         convertDate(eenmanszaak.Overlijdensdatum),
 		VolledigeNaam:            eenmanszaak.VolledigeNaam,
 		TypeFunctionaris:         "Eigenaar",
+		Importance:               5,
 	}
 	addInterpretatie(bevoegdheidUittreksel, &functionaris)
 
@@ -386,9 +425,19 @@ func eigenaarIsNietNatuurlijkPersoon(bevoegdheidUittreksel *models.BevoegdheidUi
 	loopFunctionarissen(bevoegdheidUittreksel, paths, identityNP, nnp.Heeft, basePath)
 }
 
+func formatPeilMoment(pm string) string {
+	if pm == "" {
+		return pm
+	}
+	if len(pm) != 17 {
+		return pm
+	}
+	return pm[:4] + "-" + pm[4:6] + "-" + pm[6:8] + " " + pm[8:10] + ":" + pm[10:12] + ":" + pm[12:14] + "." + pm[14:]
+}
+
 // GetBevoegdheidUittreksel TODO
 func getBevoegdheidUittreksel(bevoegdheidUittreksel *models.BevoegdheidUittreksel, paths *models.Paths, ophalenInschrijvingResponse *models.OphalenInschrijvingResponse, identityNP models.IdentityNP) {
-	bevoegdheidUittreksel.Peilmoment = ophalenInschrijvingResponse.Peilmoment
+	bevoegdheidUittreksel.Peilmoment = formatPeilMoment(ophalenInschrijvingResponse.Peilmoment)
 
 	ma := ophalenInschrijvingResponse.Product.MaatschappelijkeActiviteit
 	bevoegdheidUittreksel.KvkNummer = ma.KvkNummer

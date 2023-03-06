@@ -23,7 +23,6 @@ type BevoegdheidResponse struct {
 }
 
 type BevoegdheidUittreksel struct {
-	Peilmoment         string `json:"peilmoment"`
 	KvkNummer          string `json:"kvkNummer"`
 	Rsin               string `json:"rsin"`
 	Naam               string `json:"naam"`
@@ -41,10 +40,21 @@ type BevoegdheidUittreksel struct {
 	BijzondereRechtstoestand   string `json:"bijzondereRechtstoestand"`
 	BeperkingInRechtshandeling string `json:"beperkingInRechtshandeling"`
 	BuitenlandseRechtstoestand string `json:"buitenlandseRechtstoestand"`
-	// Handlichting               string `json:"handlichting"`
 
-	MatchedFunctionaris *Functionaris  `json:"matchedFunctionaris,omitempty"`
-	AlleFunctionarissen []Functionaris `json:"functionarissen"`
+	Peilmoment string `json:"peilmoment"`
+
+	MatchedFunctionaris              *Functionaris               `json:"matchedFunctionaris,omitempty"`
+	AlleFunctionarissen              []Functionaris              `json:"functionarissen"`
+	AlleRechtspersoonFunctionarissen []RechtspersoonFunctionaris `json:"rechtspersoonFunctionarissen"`
+}
+
+type RechtspersoonFunctionaris struct {
+	KvkNummer         string `json:"kvkNummer"`
+	PersoonRechtsvorm string `json:"persoonRechtsvorm"`
+	Naam              string `json:"naam"`
+
+	TypeFunctionaris string `json:"typeFunctionaris"`
+	Functie          string `json:"functie"`
 }
 
 type Functionaris struct {
@@ -78,6 +88,8 @@ type Functionaris struct {
 	Handlichting               string `json:"handlichting"`
 
 	Interpretatie Interpretatie `json:"interpretatie"`
+
+	Importance int64 `json:"-"`
 }
 
 type Paths struct {
@@ -98,7 +110,6 @@ type Paths struct {
 	BijzondereRechtstoestand   string `json:"bijzondereRechtstoestand"`
 	BeperkingInRechtshandeling string `json:"beperkingInRechtshandeling"`
 	BuitenlandseRechtstoestand string `json:"buitenlandseRechtstoestand"`
-	// Handlichting               string `json:"handlichting"`
 
 	MatchedFunctionaris Functionaris `json:"matchedFunctionaris,omitempty"`
 }
