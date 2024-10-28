@@ -425,6 +425,122 @@ func eigenaarIsNietNatuurlijkPersoon(bevoegdheidUittreksel *models.BevoegdheidUi
 	loopFunctionarissen(bevoegdheidUittreksel, paths, identityNP, nnp.Heeft, basePath)
 }
 
+func eigenaarIsNatuurlijkPersoonNoMatching(bevoegdheidUittreksel *models.BevoegdheidUittreksel, paths *models.Paths, eenmanszaak *models.Eenmanszaak, typeEigenaar string, basePath string) {
+	bevoegdheidUittreksel.TypeEigenaar = typeEigenaar
+	bevoegdheidUittreksel.PersoonRechtsvorm = eenmanszaak.PersoonRechtsvorm
+	bevoegdheidUittreksel.RegistratieEinde = convertDate(eenmanszaak.Registratie.DatumEinde)
+	if eenmanszaak.BijzondereRechtstoestand.Soort.Code != "" {
+		bevoegdheidUittreksel.BijzondereRechtstoestand = eenmanszaak.BijzondereRechtstoestand.Soort.Omschrijving + ":" + eenmanszaak.BijzondereRechtstoestand.Soort.Code
+	}
+	if eenmanszaak.BeperkingInRechtshandeling.Soort.Code != "" {
+		bevoegdheidUittreksel.BeperkingInRechtshandeling = eenmanszaak.BeperkingInRechtshandeling.Soort.Omschrijving + ":" + eenmanszaak.BeperkingInRechtshandeling.Soort.Code
+	}
+	// bevoegdheidUittreksel.Handlichting = eenmanszaak.Handlichting.IsVerleend.Code
+
+	paths.TypeEigenaar = basePath
+	paths.PersoonRechtsvorm = basePath + ".persoonRechtsvorm"
+	paths.RegistratieEinde = basePath + ".registratie.datumEinde"
+	paths.BijzondereRechtstoestand = basePath + ".bijzondereRechtstoestand.soort"
+	paths.BeperkingInRechtshandeling = basePath + ".beperkingInRechtshandeling.soort"
+	// bevoegdheidUittreksel.Paths.Handlichting = basePath + ".handlichting.isVerleend.code"
+
+	functionaris := models.Functionaris{
+		Geslachtsnaam:            eenmanszaak.Geslachtsnaam,
+		VoorvoegselGeslachtsnaam: eenmanszaak.VoorvoegselGeslachtsnaam,
+		Voornamen:                eenmanszaak.Voornamen,
+		Geboortedatum:            convertDate(eenmanszaak.Geboortedatum),
+		Overlijdensdatum:         convertDate(eenmanszaak.Overlijdensdatum),
+		VolledigeNaam:            eenmanszaak.VolledigeNaam,
+		TypeFunctionaris:         "Eigenaar",
+		Importance:               5,
+	}
+	addInterpretatie(bevoegdheidUittreksel, &functionaris)
+
+	bevoegdheidUittreksel.AlleFunctionarissen = append(bevoegdheidUittreksel.AlleFunctionarissen, functionaris)
+	loopFunctionarissenNoMatching(bevoegdheidUittreksel, paths, eenmanszaak.Heeft, basePath)
+}
+
+func eigenaarIsNietNatuurlijkPersoonNoMatching(bevoegdheidUittreksel *models.BevoegdheidUittreksel, paths *models.Paths, nnp *models.NietNatuurlijkPersoon, typeEigenaar string, basePath string) {
+	bevoegdheidUittreksel.TypeEigenaar = typeEigenaar
+	bevoegdheidUittreksel.Rsin = nnp.Rsin
+	bevoegdheidUittreksel.PersoonRechtsvorm = nnp.PersoonRechtsvorm
+	bevoegdheidUittreksel.DatumUitschrijving = convertDate(nnp.DatumUitschrijving)
+	bevoegdheidUittreksel.RegistratieEinde = convertDate(nnp.Registratie.DatumEinde)
+	if nnp.BijzondereRechtstoestand.Soort.Code != "" {
+		bevoegdheidUittreksel.BijzondereRechtstoestand = nnp.BijzondereRechtstoestand.Soort.Omschrijving + ":" + nnp.BijzondereRechtstoestand.Soort.Code
+	}
+	if nnp.BeperkingInRechtshandeling.Soort.Code != "" {
+		bevoegdheidUittreksel.BeperkingInRechtshandeling = nnp.BeperkingInRechtshandeling.Soort.Omschrijving + ":" + nnp.BeperkingInRechtshandeling.Soort.Code
+	}
+	bevoegdheidUittreksel.BuitenlandseRechtstoestand = nnp.BuitenlandseRechtstoestand.Beschrijving
+
+	paths.TypeEigenaar = basePath
+	paths.Rsin = basePath + ".rsin"
+	paths.PersoonRechtsvorm = basePath + ".persoonRechtsvorm"
+	paths.DatumUitschrijving = basePath + ".datumUitschrijving"
+	paths.RegistratieEinde = basePath + ".registratie.datumEinde"
+	paths.BijzondereRechtstoestand = basePath + ".bijzondereRechtstoestand.soort"
+	paths.BeperkingInRechtshandeling = basePath + ".beperkingInRechtshandeling.soort"
+	paths.BuitenlandseRechtstoestand = basePath + ".buitenlandseRechtstoestand.beschrijving"
+
+	loopFunctionarissenNoMatching(bevoegdheidUittreksel, paths, nnp.Heeft, basePath)
+}
+
+func loopFunctionarissenNoMatching(bevoegdheidUittreksel *models.BevoegdheidUittreksel, paths *models.Paths, functievervullingen []models.Functievervulling, basePath string) {
+	for i, heeft := range functievervullingen {
+		var functionarisOfGemachtigde *models.FunctionarisOfGemachtigde
+		path := basePath + ".heeft." + strconv.Itoa(i) + "."
+		functionarisType := ""
+
+		if heeft.Bestuursfunctie != nil {
+			functionarisOfGemachtigde = heeft.Bestuursfunctie
+			path = path + "bestuursfunctie"
+			functionarisType = "Bestuursfunctie"
+		} else if heeft.Aansprakelijke != nil {
+			functionarisOfGemachtigde = heeft.Aansprakelijke
+			path = path + "aansprakelijke"
+			functionarisType = "Aansprakelijke"
+		} else if heeft.FunctionarisBijzondereRechtstoestand != nil {
+			functionarisOfGemachtigde = heeft.FunctionarisBijzondereRechtstoestand
+			path = path + "functionarisBijzondereRechtstoestand"
+			functionarisType = "FunctionarisBijzondereRechtstoestand"
+		} else if heeft.OverigeFunctionaris != nil {
+			functionarisOfGemachtigde = heeft.OverigeFunctionaris
+			path = path + "overigeFunctionaris"
+			functionarisType = "OverigeFunctionaris"
+		} else if heeft.PubliekrechtelijkeFunctionaris != nil {
+			functionarisOfGemachtigde = heeft.PubliekrechtelijkeFunctionaris
+			path = path + "publiekrechtelijkeFunctionaris"
+			functionarisType = "PubliekrechtelijkeFunctionaris"
+		} else if heeft.Gemachtigde != nil {
+			functionarisOfGemachtigde = heeft.Gemachtigde
+			path = path + "gemachtigde"
+			functionarisType = "Gemachtigde"
+		}
+
+		np := functionarisOfGemachtigde.Door.NatuurlijkPersoon
+		if np == nil {
+			rp := functionarisOfGemachtigde.Door.Rechtspersoon
+			if rp == nil {
+				continue
+			}
+			rechtsPersoonFunctionaris := models.RechtspersoonFunctionaris{
+				KvkNummer:         rp.IsEigenaarVan.MaatschappelijkeActiviteit.KvkNummer,
+				PersoonRechtsvorm: rp.PersoonRechtsvorm,
+				Naam:              rp.VolledigeNaam,
+				TypeFunctionaris:  functionarisType,
+				Functie:           functionarisOfGemachtigde.Functie.Omschrijving,
+			}
+			bevoegdheidUittreksel.AlleRechtspersoonFunctionarissen = append(bevoegdheidUittreksel.AlleRechtspersoonFunctionarissen, rechtsPersoonFunctionaris)
+			continue
+		}
+
+		functionaris := getFunctionaris(functionarisOfGemachtigde, functionarisType)
+		addInterpretatie(bevoegdheidUittreksel, &functionaris)
+		bevoegdheidUittreksel.AlleFunctionarissen = append(bevoegdheidUittreksel.AlleFunctionarissen, functionaris)
+	}
+}
+
 func formatPeilMoment(pm string) string {
 	if pm == "" {
 		return pm
@@ -506,5 +622,84 @@ func getBevoegdheidUittreksel(bevoegdheidUittreksel *models.BevoegdheidUittrekse
 		eigenaarIsNietNatuurlijkPersoon(bevoegdheidUittreksel, paths, identityNP, ma.HeeftAlsEigenaar.Samenwerkingsverband, "Samenwerkingsverband", "maatschappelijkeActiviteit.heeftAlsEigenaar.samenwerkingsverband")
 	} else if ma.HeeftAlsEigenaar.AfgeslotenMoeder != nil {
 		eigenaarIsNietNatuurlijkPersoon(bevoegdheidUittreksel, paths, identityNP, ma.HeeftAlsEigenaar.AfgeslotenMoeder, "AfgeslotenMoeder", "maatschappelijkeActiviteit.heeftAlsEigenaar.afgeslotenMoeder")
+	}
+}
+
+func getLPID(bevoegdheidUittreksel *models.BevoegdheidUittreksel, ophalenInschrijvingResponse *models.OphalenInschrijvingResponse) {
+	ma := ophalenInschrijvingResponse.Product.MaatschappelijkeActiviteit
+	bevoegdheidUittreksel.KvkNummer = ma.KvkNummer
+	bevoegdheidUittreksel.Naam = ma.Naam
+}
+
+func getCompanyCertificate(bevoegdheidUittreksel *models.BevoegdheidUittreksel, paths *models.Paths, ophalenInschrijvingResponse *models.OphalenInschrijvingResponse) {
+	bevoegdheidUittreksel.Peilmoment = formatPeilMoment(ophalenInschrijvingResponse.Peilmoment)
+
+	ma := ophalenInschrijvingResponse.Product.MaatschappelijkeActiviteit
+	bevoegdheidUittreksel.KvkNummer = ma.KvkNummer
+	bevoegdheidUittreksel.Naam = ma.Naam
+	bevoegdheidUittreksel.Adres = ma.BezoekLocatie.VolledigAdres
+	bevoegdheidUittreksel.RegistratieAanvang = convertDate(ma.Registratie.DatumAanvang)
+
+	paths.KvkNummer = "maatschappelijkeActiviteit.kvkNummer"
+	paths.Naam = "maatschappelijkeActiviteit.naam"
+	paths.Adres = "maatschappelijkeActiviteit.bezoekLocatie.volledigAdres"
+	paths.RegistratieAanvang = "maatschappelijkeActiviteit.registratie.datumAanvang"
+
+	if len(ma.Communicatiegegevens.EmailAdres) != 0 {
+		bevoegdheidUittreksel.EmailAdres = ma.Communicatiegegevens.EmailAdres[0]
+	}
+	paths.EmailAdres = "maatschappelijkeActiviteit.communicatiegegevens.emailAdres.0"
+
+	for i, nr := range ma.Communicatiegegevens.Communicatienummer {
+		if nr.Soort.Code == "T" {
+			bevoegdheidUittreksel.Telefoon = nr.Toegangscode + " " + nr.Nummer[1:]
+			paths.Telefoon = "maatschappelijkeActiviteit.communicatiegegevens.communicatienummer." + strconv.Itoa(i)
+			break
+		}
+	}
+
+	for i, sbi := range ma.SbiActiviteit {
+		if sbi.IsHoofdactiviteit.Code == "J" {
+			bevoegdheidUittreksel.SbiActiviteit = sbi.SbiCode.Code + ", " + sbi.SbiCode.Omschrijving
+			paths.SbiActiviteit = "maatschappelijkeActiviteit.sbiActiviteit." + strconv.Itoa(i) + ".sbiCode"
+			break
+		}
+	}
+
+	if bevoegdheidUittreksel.SbiActiviteit == "" {
+		for i, sbi := range ma.ManifesteertZichAls.Onderneming.SbiActiviteit {
+			if sbi.IsHoofdactiviteit.Code == "J" {
+				bevoegdheidUittreksel.SbiActiviteit = sbi.SbiCode.Code + ", " + sbi.SbiCode.Omschrijving
+				paths.SbiActiviteit = "maatschappelijkeActiviteit.manifesteertZichAls.onderneming.sbiActiviteit." + strconv.Itoa(i) + ".sbiCode"
+				break
+			}
+		}
+	}
+
+	for i, handeltOnder := range ma.ManifesteertZichAls.Onderneming.HandeltOnder {
+		prefix := ", "
+		if i == 0 {
+			prefix = ""
+		}
+		bevoegdheidUittreksel.Handelsnamen = bevoegdheidUittreksel.Handelsnamen + prefix + handeltOnder.Handelsnaam.Naam
+	}
+	paths.Handelsnamen = "maatschappelijkeActiviteit.manifesteertZichAls.onderneming.handeltOnder"
+
+	if ma.HeeftAlsEigenaar.Eenmanszaak != nil {
+		eigenaarIsNatuurlijkPersoonNoMatching(bevoegdheidUittreksel, paths, ma.HeeftAlsEigenaar.Eenmanszaak, "NatuurlijkPersoon", "maatschappelijkeActiviteit.heeftAlsEigenaar.natuurlijkPersoon")
+	} else if ma.HeeftAlsEigenaar.NaamPersoon != nil {
+		eigenaarIsNietNatuurlijkPersoonNoMatching(bevoegdheidUittreksel, paths, ma.HeeftAlsEigenaar.NaamPersoon, "NaamPersoon", "maatschappelijkeActiviteit.heeftAlsEigenaar.naamPersoon")
+	} else if ma.HeeftAlsEigenaar.BuitenlandseVennootschap != nil {
+		eigenaarIsNietNatuurlijkPersoonNoMatching(bevoegdheidUittreksel, paths, ma.HeeftAlsEigenaar.BuitenlandseVennootschap, "BuitenlandseVennootschap", "maatschappelijkeActiviteit.heeftAlsEigenaar.buitenlandseVennootschap")
+	} else if ma.HeeftAlsEigenaar.EenmanszaakMetMeerdereEigenaren != nil {
+		eigenaarIsNietNatuurlijkPersoonNoMatching(bevoegdheidUittreksel, paths, ma.HeeftAlsEigenaar.EenmanszaakMetMeerdereEigenaren, "EenmanszaakMetMeerdereEigenaren", "maatschappelijkeActiviteit.heeftAlsEigenaar.eenmanszaakMetMeerdereEigenaren")
+	} else if ma.HeeftAlsEigenaar.Rechtspersoon != nil {
+		eigenaarIsNietNatuurlijkPersoonNoMatching(bevoegdheidUittreksel, paths, ma.HeeftAlsEigenaar.Rechtspersoon, "Rechtspersoon", "maatschappelijkeActiviteit.heeftAlsEigenaar.rechtspersoon")
+	} else if ma.HeeftAlsEigenaar.RechtspersoonInOprichting != nil {
+		eigenaarIsNietNatuurlijkPersoonNoMatching(bevoegdheidUittreksel, paths, ma.HeeftAlsEigenaar.RechtspersoonInOprichting, "RechtspersoonInOprichting", "maatschappelijkeActiviteit.heeftAlsEigenaar.rechtspersoonInOprichting")
+	} else if ma.HeeftAlsEigenaar.Samenwerkingsverband != nil {
+		eigenaarIsNietNatuurlijkPersoonNoMatching(bevoegdheidUittreksel, paths, ma.HeeftAlsEigenaar.Samenwerkingsverband, "Samenwerkingsverband", "maatschappelijkeActiviteit.heeftAlsEigenaar.samenwerkingsverband")
+	} else if ma.HeeftAlsEigenaar.AfgeslotenMoeder != nil {
+		eigenaarIsNietNatuurlijkPersoonNoMatching(bevoegdheidUittreksel, paths, ma.HeeftAlsEigenaar.AfgeslotenMoeder, "AfgeslotenMoeder", "maatschappelijkeActiviteit.heeftAlsEigenaar.afgeslotenMoeder")
 	}
 }

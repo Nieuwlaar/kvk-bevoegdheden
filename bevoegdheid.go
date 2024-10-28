@@ -63,3 +63,48 @@ func GetBevoegdheid(kvkNummer string, identityNP models.IdentityNP, cert string,
 
 	return bevoegdheidResponse, nil
 }
+
+func GetLPID(kvkNummer string, cert string, key string, useCache bool, env string) (*models.BevoegdheidResponse, error) {
+	ophalenInschrijvingResponse, err := GetInschrijving(kvkNummer, cert, key, useCache, env)
+	if err != nil {
+		return nil, err
+	}
+
+	bevoegdheidUittreksel := &models.BevoegdheidUittreksel{}
+	paths := &models.Paths{}
+	bevoegdheidResponse := &models.BevoegdheidResponse{
+		BevoegdheidUittreksel: bevoegdheidUittreksel,
+		Paths:                 paths,
+	}
+
+	getLPID(bevoegdheidUittreksel, ophalenInschrijvingResponse)
+
+	ma := ophalenInschrijvingResponse.Product.MaatschappelijkeActiviteit
+	bevoegdheidResponse.InschrijvingXML = ophalenInschrijvingResponse.InschrijvingXML
+	bevoegdheidResponse.Inschrijving = ma
+
+	return bevoegdheidResponse, nil
+}
+
+func GetCompanyCertificate(kvkNummer string, cert string, key string, useCache bool, env string) (*models.BevoegdheidResponse, error) {
+
+	ophalenInschrijvingResponse, err := GetInschrijving(kvkNummer, cert, key, useCache, env)
+	if err != nil {
+		return nil, err
+	}
+
+	bevoegdheidUittreksel := &models.BevoegdheidUittreksel{}
+	paths := &models.Paths{}
+	bevoegdheidResponse := &models.BevoegdheidResponse{
+		BevoegdheidUittreksel: bevoegdheidUittreksel,
+		Paths:                 paths,
+	}
+
+	getCompanyCertificate(bevoegdheidUittreksel, paths, ophalenInschrijvingResponse)
+
+	ma := ophalenInschrijvingResponse.Product.MaatschappelijkeActiviteit
+	bevoegdheidResponse.InschrijvingXML = ophalenInschrijvingResponse.InschrijvingXML
+	bevoegdheidResponse.Inschrijving = ma
+
+	return bevoegdheidResponse, nil
+}
